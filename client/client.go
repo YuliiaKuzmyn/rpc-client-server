@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math/rand"
 	"net/rpc"
 	"os"
 	"os/exec"
@@ -61,8 +62,13 @@ func (c *rpcConn) handleProcessRequest(args string) error {
 		parts[1],
 	}
 
+	err := generateIntToFile(request.InputFile)
+	if err != nil {
+		return err
+	}
+
 	var result string
-	err := c.client.Call("Server.Process", request, &result)
+	err = c.client.Call("Server.Process", request, &result)
 	if err != nil {
 		return err
 	} else {
@@ -117,6 +123,37 @@ func (c *rpcConn) StartCli() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func randomArray(size int) []int {
+	array := make([]int, size)
+
+	for i := range array {
+		array[i] = rand.Intn(1000)
+	}
+
+	return array
+}
+
+func generateIntToFile(path string) error {
+
+	// open file using READ & WRITE permission
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	array := randomArray(1000)
+	strArray := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(array)), " "), "[]")
+
+	// write into file
+	_, err = file.WriteString(strArray)
+	if err != nil {
+		return err
 	}
 
 	return nil

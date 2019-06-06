@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Server struct {}
@@ -77,7 +78,9 @@ func writeFile(p []int, path string) error {
 
 func readFile(fname string) (nums []int, err error) {
 	b, err := ioutil.ReadFile(fname)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 
 	lines := strings.Split(string(b), "\n")
 	// Assign cap to avoid resize on every append.
@@ -107,16 +110,21 @@ func readFile(fname string) (nums []int, err error) {
 }
 
 func selectionSort(items []int) {
-	var n = len(items)
-	for i := 0; i < n; i++ {
+
+	start := time.Now()
+
+	var arrayLength = len(items)
+	for i := 0; i < arrayLength; i++ {
 		var minIdx = i
-		for j := i; j < n; j++ {
+		for j := i; j < arrayLength; j++ {
 			if items[j] < items[minIdx] {
 				minIdx = j
 			}
 		}
 		items[i], items[minIdx] = items[minIdx], items[i]
 	}
+
+	fmt.Printf("\n---- Selection sort of %d random values took server: %s ----\n", arrayLength, time.Since(start))
 }
 
 func server() error {
